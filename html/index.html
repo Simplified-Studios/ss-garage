@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+        <script src="../config.js" defer></script>
+        <script src="script.js" defer></script>
+        <title>Simplified Studios</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="garage-container" style="display: none;">
+            <div class="mx-auto w-[600px] overflow-hidden rounded-lg h-[51rem] bg-slate-900 mb-10">
+                <img id="garageimage" src="./img/legionsquare.png" class="h-[125px] aspect-video w-full object-cover opacity-50" alt="" />
+                <div class="p-4">
+                    <a class="text-xl font-medium text-gray-300">Viewing Garage</a>
+                    <p class="text-xs font-medium text-gray-500">Currently viewing garage located in <span id="garagelabel">Legion Square</span></p>
+                    <div class="text-sm text-gray-600 h-[595px] overflow-y-scroll overflow-hidden list-none bg-slate-800 bg-opacity-50 px-4 py-3.5 mt-5 rounded-md">
+                        <div class="vehicle-container space-y-2">
+                            <!-- Vehicles go here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- popup (swap garage) -->
+        <div class="swap-container mx-auto w-[600px] overflow-hidden rounded-lg px-2 bg-slate-900 mb-10" style="display: none;">
+            <div class="p-4">
+                <a class="text-xl font-medium text-gray-300">Swap Garages</a>
+                <p class="text-xs font-medium text-gray-500">Select the garage you want to move the vehicle to</p>
+                <select id="garageSelect" data-te-select-init class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover">
+                    <!-- Options will be dynamically added here using jQuery -->
+                </select>
+                <button id="confirm-swap" type="button" class="mt-5 ml-[435px] rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Confirm Action</button>
+            </div>
+        </div>
+
+        <!-- popup (transfer vehicle) -->
+        <div class="transfer-container mx-auto w-[600px] overflow-hidden rounded-lg px-2 bg-slate-900 mb-10" style="display: none;">
+            <div class="p-4">
+                <a class="text-xl font-medium text-gray-300">Transfer Vehicle</a>
+                <p class="text-xs font-medium text-gray-500">Type in the player you want to give the vehicle to</p>
+                <input type="text" id="transfervehicle" placeholder=" Type in the ID of the wanted player" class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover"></input>
+                <button id="confirm-transfer" type="button" class="mt-5 ml-[435px] rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Confirm Action</button> 
+            </div>                         
+        </div>
+    </body>
+</html>
