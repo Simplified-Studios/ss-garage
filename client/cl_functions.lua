@@ -45,22 +45,6 @@ function doCarDamage(currentVehicle, stats, props)
     end
 end
 
-function CheckPlate(vehicle, plateToSet)
-    local vehiclePlate = promise.new()
-    CreateThread(function()
-        while true do
-            Wait(500)
-            if GetVehicleNumberPlateText(vehicle) == plateToSet then
-                vehiclePlate:resolve(true)
-                return
-            else
-                SetVehicleNumberPlateText(vehicle, plateToSet)
-            end
-        end
-    end)
-    return vehiclePlate
-end
-
 function IsVehicleAllowed(classList, vehicle)
     if not Config.ClassSystem then return true end
     for _, class in ipairs(classList) do

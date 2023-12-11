@@ -13,6 +13,7 @@ RegisterNetEvent('ss-garage:openGarage', function(data, garage)
             engine = v.engine / 10,
             body = v.body / 10,
             impounded = v.depotprice > 0 and true or false,
+            fakeplate = v.fakeplate,
         }
     end
     SendNUIMessage({
@@ -30,7 +31,6 @@ RegisterNetEvent('ss-garage:takeOut', function(data)
     QBCore.Functions.TriggerCallback('qb-garages:server:spawnvehicle', function(netId, properties, vehPlate)
         while not NetworkDoesNetworkIdExist(netId) do Wait(10) end
         local veh = NetworkGetEntityFromNetworkId(netId)
-        Citizen.Await(CheckPlate(veh, vehPlate))
         QBCore.Functions.SetVehicleProperties(veh, properties)
         exports['LegacyFuel']:SetFuel(veh, data.fuel)
         TriggerServerEvent('qb-garages:server:updateVehicleState', 0, vehPlate)
@@ -38,7 +38,7 @@ RegisterNetEvent('ss-garage:takeOut', function(data)
         TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
         doCarDamage(veh, {engine = data.engine * 10, fuel = data.fuel, body = data.body * 10}, properties)
         SetVehicleEngineOn(veh, true, true, false)
-    end, data.plate, data.model, location, true)
+    end, data.plate, data.model, location, data.fakeplate)
 end)
 
 RegisterNUICallback('takeOut', function(data, cb)
@@ -66,7 +66,7 @@ end)
 
 local garageZones = {}
 local blips = {}
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+CreateThread(function()
     for index, garage in pairs(Config.Garages) do
 
         if garage.showBlip then

@@ -70,6 +70,7 @@ window.addEventListener('message', function(event) {
 
             $(`#swap-${index}`).on('click', function(event) {
                 currentVehicle = vehicle;
+                $('.garage-container').css('display', 'none')
                 $.each(garages, function (index, value) {
                     if (value.label && value.canTransfer) {
                         $("#garageSelect").append('<option value="' + (index) + '">' + value.label + '</option>');
@@ -79,6 +80,7 @@ window.addEventListener('message', function(event) {
             });
 
             $(`#transfer-${index}`).on('click', function(event) {
+                $('.garage-container').css('display', 'none')
                 currentVehicle = vehicle;
                 $('.transfer-container').css('display', 'block')
             });

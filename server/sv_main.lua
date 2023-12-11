@@ -89,8 +89,7 @@ end)
 
 QBCore.Functions.CreateCallback('qb-garages:server:canDeposit', function(source, cb, plate, type, garage, state)
     local Player = QBCore.Functions.GetPlayer(source)
-    -- local isOwned = exports['oxmysql']:fetch('SELECT * FROM player_vehicles WHERE plate = ?', { tostring(plate) })
-    local vehicle = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?', { Player.PlayerData.citizenid, plate})
+    local vehicle = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND (plate = ? OR fakeplate = ?)', { Player.PlayerData.citizenid, plate, plate })
     if not vehicle[1] then cb(false) return end
     if type == 'house' and not exports['qb-houses']:hasKey(Player.PlayerData.license, Player.PlayerData.citizenid, Config.HouseGarages[garage].label) then
         cb(false)
@@ -104,15 +103,20 @@ QBCore.Functions.CreateCallback('qb-garages:server:canDeposit', function(source,
     end
 end)
 
-QBCore.Functions.CreateCallback('qb-garages:server:spawnvehicle', function(source, cb, plate, vehicle, coords)
+QBCore.Functions.CreateCallback('qb-garages:server:spawnvehicle', function(source, cb, plate, vehicle, coords, fakeplate)
     local vehType = QBCore.Shared.Vehicles[vehicle] and QBCore.Shared.Vehicles[vehicle].type or GetVehicleTypeByModel(vehicle)
     local veh = CreateVehicleServerSetter(GetHashKey(vehicle), vehType, coords.x, coords.y, coords.z, coords.w)
     local netId = NetworkGetNetworkIdFromEntity(veh)
-    SetVehicleNumberPlateText(veh, plate)
+    local setPlate = nil
+    if fakeplate ~= nil and string.len(fakeplate) > 0 then
+        setPlate = fakeplate
+    else
+        setPlate = plate
+    end
+    SetVehicleNumberPlateText(veh, setPlate)
     local vehProps = {}
-    local result = exports['oxmysql']:fetchSync('SELECT mods FROM player_vehicles WHERE plate = ?', { plate })
+    local result = exports['oxmysql']:fetchSync('SELECT mods FROM player_vehicles WHERE plate = ?', { setPlate })
     if result and result[1] then vehProps = json.decode(result[1].mods) end
-    OutsideVehicles[plate] = { netID = netId, entity = veh }
-    print(json.encode(OutsideVehicles))
-    cb(netId, vehProps, plate)
+    OutsideVehicles[setPlate] = { netID = netId, entity = veh }
+    cb(netId, vehProps, setPlate)
 end)
