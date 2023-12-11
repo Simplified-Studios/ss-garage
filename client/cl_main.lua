@@ -8,7 +8,7 @@ RegisterNetEvent('ss-garage:openGarage', function(data, garage)
             model = v.vehicle,
             garage = v.garage,
             state = v.state,
-            name = QBCore.Shared.Vehicles[v.vehicle].name,
+            name = QBCore.Shared.Vehicles[v.vehicle].name or v.vehicle,
             fuel = v.fuel,
             engine = v.engine / 10,
             body = v.body / 10,
