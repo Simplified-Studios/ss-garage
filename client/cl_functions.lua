@@ -3,10 +3,8 @@ local QBCore = exports['qb-core']:GetCoreObject()
 function GetSpawnPoint(garage)
     local location = nil
     if #Config.Garages[garage].spawnPoint > 1 then
-        local maxTries = #Config.Garages[garage].spawnPoint
-        for i = 1, maxTries do
-            local randomIndex = math.random(1, #Config.Garages[garage].spawnPoint)
-            local chosenSpawnPoint = Config.Garages[garage].spawnPoint[randomIndex]
+        for i = 1, #Config.Garages[garage].spawnPoint do
+            local chosenSpawnPoint = Config.Garages[garage].spawnPoint[i]
             local isOccupied = IsPositionOccupied( chosenSpawnPoint.x, chosenSpawnPoint.y, chosenSpawnPoint.z, 5.0, false, true, false, false, false, 0, false )
             if not isOccupied then
                 location = chosenSpawnPoint
