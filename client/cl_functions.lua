@@ -178,7 +178,7 @@ local houseComboZones = nil
 function CreateHouseZone(index, garage, zoneType)
     local houseZone = CircleZone:Create(garage.takeVehicle, 5.0, {
         name = zoneType .. '_' .. index,
-        debugPoly = true,
+        debugPoly = false,
         data = {
             indexgarage = index,
             type = zoneType,
@@ -190,7 +190,7 @@ function CreateHouseZone(index, garage, zoneType)
         houseGarageZones[#houseGarageZones + 1] = houseZone
 
         if not houseComboZones then
-            houseComboZones = ComboZone:Create(houseGarageZones, { name = 'houseComboZones', debugPoly = true })
+            houseComboZones = ComboZone:Create(houseGarageZones, { name = 'houseComboZones', debugPoly = false })
         else
             houseComboZones:AddZone(houseZone)
         end
