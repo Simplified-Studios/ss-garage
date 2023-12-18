@@ -91,3 +91,54 @@ RegisterNetEvent('qb-garages:server:UpdateOutsideVehicle', function(plate, vehic
         entity = NetworkGetEntityFromNetworkId(vehicleNetID)
     }
 end)
+
+RegisterNetEvent('ss-garage:server:SwapVehicle', function(data)
+    local source = source
+    local Player = QBCore.Functions.GetPlayer(source)
+    local vehicle = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND garage = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.garageindex })
+    
+    if not Config.Garages[data.garage] then
+        TriggerClientEvent('QBCore:Notify', source, 'This garage does not exist', 'error')
+        return
+    end
+
+    if not vehicle[1] then
+        TriggerClientEvent('QBCore:Notify', source, 'You do not own this vehicle', 'error')
+        return
+    end
+
+    if OutsideVehicles[vehicle[1].plate] and DoesEntityExist(OutsideVehicles[vehicle[1].plate].entity) then
+        TriggerClientEvent('QBCore:Notify', source, 'This vehicle is already out', 'error')
+        return
+    end
+
+    TriggerClientEvent('QBCore:Notify', source, 'You swapped the vehicle to '..data.garage, 'success')
+    exports['oxmysql']:execute('UPDATE player_vehicles SET garage = ? WHERE plate = ?', { data.garage, data.vehicle.plate })
+end)
+
+RegisterNetEvent('ss-garage:server:TransferVehicle', function(data)
+    local source = source
+    local Player = QBCore.Functions.GetPlayer(source)
+    local vehicle = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND garage = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.garageindex })
+
+    if not vehicle[1] then
+        TriggerClientEvent('QBCore:Notify', source, 'You do not own this vehicle', 'error')
+        return
+    end
+
+    if OutsideVehicles[vehicle[1].plate] and DoesEntityExist(OutsideVehicles[vehicle[1].plate].entity) then
+        TriggerClientEvent('QBCore:Notify', source, 'This vehicle is already out', 'error')
+        return
+    end
+
+    local target = QBCore.Functions.GetPlayer(tonumber(data.id))
+
+    if not target then
+        TriggerClientEvent('QBCore:Notify', source, 'This player is not online', 'error')
+        return
+    end
+
+    TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You have transferred your vehicle to '..target.PlayerData.charinfo.firstname..' '..target.PlayerData.charinfo.lastname, 'success')
+    TriggerClientEvent('QBCore:Notify', target.PlayerData.source, 'You have received a vehicle from '..Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname, 'success')
+    exports['oxmysql']:execute('UPDATE player_vehicles SET citizenid = ?, license = ? WHERE plate = ?', { target.PlayerData.citizenid, target.PlayerData.license, data.vehicle.plate })
+end)

@@ -133,4 +133,5 @@ function close() {
     $('.garage-container').css('display', 'none')
     $('.swap-container').css('display', 'none')
     $('.transfer-container').css('display', 'none')
+    $('#garageSelect').empty();
 }

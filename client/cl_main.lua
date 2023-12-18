@@ -30,11 +30,13 @@ RegisterNUICallback('takeOut', function(data, cb)
 end)
 
 RegisterNUICallback('transfer', function(data, cb)
+    TriggerServerEvent('ss-garage:server:TransferVehicle', data)
     SetNuiFocus(false, false)
     cb('ok')
 end)
 
 RegisterNUICallback('swap', function(data, cb)
+    TriggerServerEvent('ss-garage:server:SwapVehicle', data)
     SetNuiFocus(false, false)
     cb('ok')
 end)

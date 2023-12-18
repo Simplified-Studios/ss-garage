@@ -37,6 +37,7 @@ function FormatVehicles(result)
             spawn = VehicleData['model'],
             plate = v.plate,
             garage = VehicleGarage,
+            garageindex = v.garage,
             state = stateTranslation,
             fuel = v.fuel,
             engine = v.engine,
