@@ -8,7 +8,14 @@ window.addEventListener('message', function(event) {
         var vehicles = event.data.vehicles;
         var garages = event.data.garages;
 
-        $('#garageimage').attr('src', `img/${event.data.garageindex}.png`);
+        var garageImage = $('#garageimage');
+        var garageImageURL = `img/${event.data.garageindex}.png`;
+        garageImage.attr('src', garageImageURL);
+        garageImage.on('error', function() {
+            garageImage.attr('src', 'img/default.png');
+            garageImage.off('error');
+        });
+
         $('#garagelabel').text(event.data.garages[event.data.garageindex].label);
 
         vehicles.forEach(function(vehicle, index) {
@@ -17,7 +24,7 @@ window.addEventListener('message', function(event) {
             <summary class="flex cursor-pointer list-none items-center justify-between bg-slate-800 rounded-lg px-3 py-2 text-[15px] font-medium text-white hover:bg-slate-800">
                 <summary class="flex">
                     <a class="mr-2 rounded-md bg-green-300 text-xs font-medium tracking-wide px-[5px] py-[2px] text-green-800">${vehicle.plate}</a>
-                    <carname class="w-[100px] overflow-hidden text-ellipsis line-clamp-1">${vehicle.name}</carname>
+                    <carname class="text-ellipsis line-clamp-1">${vehicle.fullname}</carname>
                 </summary>
                 <div class="text-secondary-500">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="block h-5 w-5 group-open:hidden">
@@ -29,10 +36,14 @@ window.addEventListener('message', function(event) {
                 </div>
             </summary>
             <div class="px-6 pb-4 text-xs text-white">
-                ${vehicle.impounded ? '<br><a class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Impounded</a>' : ''}
-
-                ${vehicle.impounded ? '' : `<br><a class="rounded-md bg-slate-600 text-xs font-medium tracking-wide px-[5px] py-[2px] text-white">${event.data.garages[event.data.garageindex].label}</a>`}
-
+                ${vehicle.state === 0 ?
+                    '<br><a class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Out</a>' :
+                    vehicle.state === 1 ?
+                    `<br><a class="rounded-md bg-slate-600 text-xs font-medium tracking-wide px-[5px] py-[2px] text-white">${event.data.garages[event.data.garageindex].label}</a>` :
+                    vehicle.state === 2 ?
+                    '<br><a class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Impounded</a>' :
+                    ''
+                }
                 <p class="mt-5 text-[15px] font-bold">Vehicle Status</p>
                 <div class="space-y-1">
                     <dl class="flex items-center justify-between">
@@ -44,17 +55,17 @@ window.addEventListener('message', function(event) {
                     </div>
                     <dl class="flex items-center justify-between">
                         <dt class="mt-1 text-sm font-medium text-secondary-700">Engine</dt>
-                        <dd class="text-sm text-secondary-500">${vehicle.engine}%</dd>
+                        <dd class="text-sm text-secondary-500">${vehicle.engine / 10}%</dd>
                     </dl>
                     <div class="relative flex h-2 w-full overflow-hidden rounded-full bg-slate-700">
-                        <div role="progressbar" aria-valuenow="${vehicle.engine}" aria-valuemin="0" aria-valuemax="100" style="width: ${vehicle.engine}%" class="flex h-full items-center justify-center bg-blue-300 text-white"></div>
+                        <div role="progressbar" aria-valuenow="${vehicle.engine / 10}" aria-valuemin="0" aria-valuemax="100" style="width: ${vehicle.engine / 10}%" class="flex h-full items-center justify-center bg-blue-300 text-white"></div>
                     </div>
                     <dl class="flex items-center justify-between">
                         <dt class="mt-1 text-sm font-medium text-secondary-700">Body</dt>
-                        <dd class="text-sm text-secondary-500">${vehicle.body}%</dd>
+                        <dd class="text-sm text-secondary-500">${vehicle.body / 10}%</dd>
                     </dl>
                     <div class="relative flex h-2 w-full overflow-hidden rounded-full bg-slate-700">
-                        <div role="progressbar" aria-valuenow="${vehicle.body}" aria-valuemin="0" aria-valuemax="100" style="width: ${vehicle.body}%" class="flex h-full items-center justify-center bg-green-300 text-white"></div>
+                        <div role="progressbar" aria-valuenow="${vehicle.body / 10}" aria-valuemin="0" aria-valuemax="100" style="width: ${vehicle.body / 10}%" class="flex h-full items-center justify-center bg-green-300 text-white"></div>
                     </div>
                 </div>
                 <button type="button" id="drive-${index}" class="mt-5 rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Drive Vehicle</button>
@@ -63,7 +74,6 @@ window.addEventListener('message', function(event) {
             `;
             $('.vehicle-container').append(vehicleHtml);
 
-            // Add click event handlers for the new buttons
             $(`#drive-${index}`).on('click', function(event) {
                 driveVehicle(vehicle);
             });

@@ -22,7 +22,6 @@ client_scripts {
 }
 
 server_scripts {
-    'config.lua',
     'server/sv_main.lua',
     'server/sv_functions.lua',
 }
