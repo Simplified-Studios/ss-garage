@@ -42,7 +42,7 @@ RegisterNetEvent('ss-garage:server:setHouseGarages', function(data)
     Config.Garages = data
 end)
 
-QBCore.Functions.CreateCallback('qb-garages:server:canDeposit', function(source, cb, plate, type, garage, state)
+QBCore.Functions.CreateCallback('ss-garage:server:canDeposit', function(source, cb, plate, type, garage, state)
     local Player = QBCore.Functions.GetPlayer(source)
     local isOwned = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND (plate = ? OR fakeplate = ?)', {Player.PlayerData.citizenid, plate})
     if not isOwned[1] then
@@ -81,11 +81,11 @@ QBCore.Functions.CreateCallback('ss-garage:server:GetVehicles', function(source,
     end
 end)
 
-RegisterNetEvent('qb-garages:server:updateVehicleStats', function(plate, fuel, engine, body)
+RegisterNetEvent('ss-garage:server:updateVehicleStats', function(plate, fuel, engine, body)
     exports['oxmysql']:execute('UPDATE player_vehicles SET fuel = ?, engine = ?, body = ? WHERE plate = ?', { fuel, engine, body, plate })
 end)
 
-RegisterNetEvent('qb-garages:server:UpdateOutsideVehicle', function(plate, vehicleNetID)
+RegisterNetEvent('ss-garage:server:UpdateOutsideVehicle', function(plate, vehicleNetID)
     OutsideVehicles[plate] = {
         netID = vehicleNetID,
         entity = NetworkGetEntityFromNetworkId(vehicleNetID)
@@ -141,4 +141,8 @@ RegisterNetEvent('ss-garage:server:TransferVehicle', function(data)
     TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You have transferred your vehicle to '..target.PlayerData.charinfo.firstname..' '..target.PlayerData.charinfo.lastname, 'success')
     TriggerClientEvent('QBCore:Notify', target.PlayerData.source, 'You have received a vehicle from '..Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname, 'success')
     exports['oxmysql']:execute('UPDATE player_vehicles SET citizenid = ?, license = ? WHERE plate = ?', { target.PlayerData.citizenid, target.PlayerData.license, data.vehicle.plate })
+end)
+
+RegisterNetEvent('ss-garage:server:SaveVehicleProps', function(props)
+    exports['oxmysql']:execute('UPDATE player_vehicles SET mods = ? WHERE plate = ?', { json.encode(props), props.plate })
 end)

@@ -1,3 +1,4 @@
+currentZone = nil
 local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNetEvent('ss-garage:client:openGarage', function()
