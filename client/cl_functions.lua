@@ -73,15 +73,15 @@ end
 
 function DepositVehicle(veh, data)
     local plate = QBCore.Functions.GetPlate(veh)
-    QBCore.Functions.TriggerCallback('qb-garages:server:canDeposit', function(canDeposit)
+    QBCore.Functions.TriggerCallback('ss-garage:server:canDeposit', function(canDeposit)
         if canDeposit then
             local bodyDamage = math.ceil(GetVehicleBodyHealth(veh))
             local engineDamage = math.ceil(GetVehicleEngineHealth(veh))
             local totalFuel = exports[Config.FuelSystem]:GetFuel(veh)
-            TriggerServerEvent('qb-mechanicjob:server:SaveVehicleProps', QBCore.Functions.GetVehicleProperties(veh))
-            TriggerServerEvent('qb-garages:server:updateVehicleStats', plate, totalFuel, engineDamage, bodyDamage)
+            TriggerServerEvent('ss-garage:server:SaveVehicleProps', QBCore.Functions.GetVehicleProperties(veh))
+            TriggerServerEvent('ss-garage:server:updateVehicleStats', plate, totalFuel, engineDamage, bodyDamage)
             CheckPlayers(veh)
-            if plate then TriggerServerEvent('qb-garages:server:UpdateOutsideVehicle', plate, nil) end
+            if plate then TriggerServerEvent('ss-garage:server:UpdateOutsideVehicle', plate, nil) end
             QBCore.Functions.Notify(Lang:t('success.vehicle_parked'), 'primary', 4500)
         else
             QBCore.Functions.Notify(Lang:t('error.not_owned'), 'error', 3500)
