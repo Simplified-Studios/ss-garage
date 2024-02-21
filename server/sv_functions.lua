@@ -3,8 +3,6 @@ local QBCore = exports['qb-core']:GetCoreObject()
 function FormatVehicles(result)
     local Vehicles = {}
     for _, v in pairs(result) do
-        local VehicleData = QBCore.Shared.Vehicles[v.vehicle]
-
         local VehicleGarage = Lang:t('error.no_garage')
         if v.garage ~= nil then
             if Config.Garages[v.garage] ~= nil then
@@ -23,18 +21,9 @@ function FormatVehicles(result)
             stateTranslation = Lang:t('status.impound')
         end
 
-        local fullname
-        if VehicleData and VehicleData['brand'] then
-            fullname = VehicleData['brand'] .. ' ' .. VehicleData['name']
-        else
-            fullname = VehicleData and VehicleData['name'] or 'Unknown Vehicle'
-        end
-
         Vehicles[#Vehicles + 1] = {
-            fullname = fullname,
-            brand = VehicleData and VehicleData['brand'] or '',
-            model = VehicleData and VehicleData['name'] or '',
-            spawn = VehicleData['model'],
+            fullname = QBCore.Shared.Vehicles[v.vehicle]['brand'].. ' '..QBCore.Shared.Vehicles[v.vehicle]['name'] or v.vehicle,
+            spawn = v.vehicle,
             plate = v.plate,
             garage = VehicleGarage,
             garageindex = v.garage,
