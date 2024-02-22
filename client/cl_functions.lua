@@ -11,7 +11,7 @@ function GetSpawnPoint(garage)
         end
     end
     if not location then
-        QBCore.Functions.Notify(Lang:t('error.vehicle_occupied'), 'error')
+        QBCore.Functions.Notify(Lang:t('error.no_spawn'), 'error')
     end
     return location
 end
