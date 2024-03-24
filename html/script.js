@@ -91,6 +91,9 @@ new Vue({
             this.garageVisible = false;
             this.swapVisible = false;
             this.transferVisible = false;
+            this.garages = [];
+            this.vehicles = [];
+            this.currentVehicle = null;
             $('#garageSelect').empty();
             $.post('https://ss-garage/close', JSON.stringify({}));
 
