@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Simplified Studios</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="app">
+            <div class="helptext"> {{ helptext }} </div>
+            <div class="garage-container" v-show="garageVisible">
+                <div class="mx-auto w-[600px] overflow-hidden rounded-lg h-[51rem] bg-slate-900 mb-10">
+                    <img :src="garageImage" class="h-[125px] aspect-video w-full object-cover opacity-50" alt="" />
+                    <div class="p-4">
+                        <a class="text-xl font-medium text-gray-300"> {{ locales.viewinggarage }} </a>
+                        <p class="text-xs font-medium text-gray-500">{{ locales.locatedin }} <span>{{ currentGarage.label }}</span></p>
+                        <div class="text-sm text-gray-600 h-[595px] overflow-y-scroll overflow-hidden list-none bg-slate-800 bg-opacity-50 px-4 py-3.5 mt-5 rounded-md">
+                            <div class="vehicle-container space-y-2">
+                                <div v-for="(vehicle, index) in vehicles" :key="index">
+                                    <details class="group rounded-lg open:bg-slate-800">
+                                        <summary class="flex cursor-pointer list-none items-center justify-between bg-slate-800 rounded-lg px-3 py-2 text-[15px] font-medium text-white hover:bg-slate-800">
+                                            <summary class="flex">
+                                                <a class="mr-2 rounded-md bg-green-300 text-xs font-medium tracking-wide px-[5px] py-[2px] text-green-800">{{ vehicle.plate }}</a>
+                                                <div class="text-ellipsis line-clamp-1">{{ vehicle.label }}</div>
+                                            </summary>
+                                            <div class="text-secondary-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="block h-5 w-5 group-open:hidden">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden h-5 w-5 group-open:block">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                        </summary>
+                                        <div class="px-6 pb-4 text-xs text-white">
+                                            <br>
+                                            <a v-if="vehicle.state === 0" class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Out</a>
+                                            <a v-if="vehicle.state === 1" class="rounded-md bg-slate-600 text-xs font-medium tracking-wide px-[5px] py-[2px] text-white">{{ currentGarage.label }}</a>
+                                            <br v-if="vehicle.state === 2">
+                                            <a v-if="vehicle.state === 2" class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Impounded</a>
+                                            <p class="mt-5 text-[15px] font-bold"> {{ locales.vehstatus }} </p>
+                                            <div class="space-y-1">
+                                                <dl class="flex items-center justify-between">
+                                                    <dt class="mt-1 text-sm font-medium text-secondary-700">Fuel</dt>
+                                                    <dd class="text-sm text-secondary-500">{{ vehicle.fuel }}%</dd>
+                                                </dl>
+                                                <div class="relative flex h-2 w-full overflow-hidden rounded-full bg-slate-700">
+                                                    <div role="progressbar" :aria-valuenow="vehicle.fuel" aria-valuemin="0" aria-valuemax="100" :style="{ width: vehicle.fuel + '%' }" class="flex h-full items-center justify-center bg-orange-300 text-white"></div>
+                                                </div>
+                                                <dl class="flex items-center justify-between">
+                                                    <dt class="mt-1 text-sm font-medium text-secondary-700">Engine</dt>
+                                                    <dd class="text-sm text-secondary-500">{{ vehicle.engine / 10 }}%</dd>
+                                                </dl>
+                                                <div class="relative flex h-2 w-full overflow-hidden rounded-full bg-slate-700">
+                                                    <div role="progressbar" :aria-valuenow="vehicle.engine / 10" aria-valuemin="0" aria-valuemax="100" :style="{ width: vehicle.engine / 10 + '%' }" class="flex h-full items-center justify-center bg-blue-300 text-white"></div>
+                                                </div>
+                                                <dl class="flex items-center justify-between">
+                                                    <dt class="mt-1 text-sm font-medium text-secondary-700">Body</dt>
+                                                    <dd class="text-sm text-secondary-500">{{ vehicle.body / 10 }}%</dd>
+                                                </dl>
+                                                <div class="relative flex h-2 w-full overflow-hidden rounded-full bg-slate-700">
+                                                    <div role="progressbar" :aria-valuenow="vehicle.body / 10" aria-valuemin="0" aria-valuemax="100" :style="{ width: vehicle.body / 10 + '%' }" class="flex h-full items-center justify-center bg-green-300 text-white"></div>
+                                                </div>
+                                            </div>
+                                            <!-- if vehicle.isImpounded then -->
+                                            <button v-if="vehicle.isImpounded" @click="payForVehicle(vehicle)" class="mt-5 rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Pay ${{vehicle.impoundPrice}}</button>
+
+                                            <!-- else -->
+                                            <button v-else @click="driveVehicle(vehicle)" class="mt-5 rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Drive Vehicle</button>
+
+                                            <button @click="swapGarage(vehicle)" class="ml-2 rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Swap Garages</button>
+                                            <button @click="transferVehicle(vehicle)" class="ml-2 rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Transfer Vehicle</button>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- popup (swap garage) -->
+            <div class="swap-container mx-auto w-[600px] overflow-hidden rounded-lg px-2 bg-slate-900 mb-10" v-show="swapVisible">
+                <div class="p-4">
+                    <a class="text-xl font-medium text-gray-300"> {{ locales.swap }} </a>
+                    <p class="text-xs font-medium text-gray-500"> {{ locales.selectgarage }} </p>
+                    <select id="garageSelect" data-te-select-init class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover">
+                        <option v-for="(garage, index) in garages" :key="index" v-if="garage.label && garage.canTransfer" :value="index">{{ garage.label }}</option>
+                    </select>
+                    <button @click="confirmSwap" class="mt-5 ml-[435px] rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Confirm Action</button>
+                </div>
+            </div>
+            <!-- popup (transfer vehicle) -->
+            <div class="transfer-container mx-auto w-[600px] overflow-hidden rounded-lg px-2 bg-slate-900 mb-10" v-show="transferVisible">
+                <div class="p-4">
+                    <a class="text-xl font-medium text-gray-300"> {{ locales.transfer }} </a>
+                    <p class="text-xs font-medium text-gray-500"> {{ locales.transferto }} </p>
+                    <input type="text" id="transfervehicle" placeholder=" Type in the ID of the wanted player" class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover"></input>
+                    <input type="text" id="transferprice" placeholder=" Type in the price of the vehicle" class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover"></input>
+                    <button @click="confirmTransfer" class="mt-5 ml-[435px] rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Confirm Action</button>
+                </div>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
