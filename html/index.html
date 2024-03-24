@@ -90,7 +90,7 @@
                     <a class="text-xl font-medium text-gray-300"> {{ locales.swap }} </a>
                     <p class="text-xs font-medium text-gray-500"> {{ locales.selectgarage }} </p>
                     <select id="garageSelect" data-te-select-init class="mt-6 h-8 w-full bg-slate-800 text-white border border-slate-700 outline-none rounded-[5px] disabled:cursor-not-allowed disabled:bg-gray-50 option:hover">
-                        <option v-for="(garage, index) in garages" :key="index" v-if="garage.label && garage.canTransfer" :value="index">{{ garage.label }}</option>
+                        <option v-for="(garage, index) in garages" :key="index" v-if="garage.canTransfer" :value="index">{{ garage.label }}</option>
                     </select>
                     <button @click="confirmSwap" class="mt-5 ml-[435px] rounded-md border-gray-700 bg-slate-700 px-2.5 py-1.5 text-center text-sm font-medium text-white transition-all hover:bg-green-300 hover:text-green-800 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300">Confirm Action</button>
                 </div>
