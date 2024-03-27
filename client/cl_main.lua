@@ -163,7 +163,7 @@ function doCarDamage(currentVehicle, stats, props)
     SetVehicleEngineHealth(currentVehicle, engine)
     SetVehicleBodyHealth(currentVehicle, body)
 
-    if Config.Framework == 'esx' then local props = json.decode(props) end
+    if Config.Framework == 'esx' then props = json.decode(props) end
 
     if props.doorStatus then
         for k, v in pairs(props.doorStatus) do
