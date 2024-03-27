@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 description 'Simplified Studios Garage'
-version '0.04'
+version '0.05'
 
 ui_page 'html/index.html'
 
