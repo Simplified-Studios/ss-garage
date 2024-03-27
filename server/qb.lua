@@ -9,7 +9,9 @@ if Config.Framework == 'qb' then
 
     AddEventHandler('onResourceStart', function(resource)
         if resource == GetCurrentResourceName() then
-            exports['oxmysql']:execute('UPDATE player_vehicles SET state = 1 WHERE state = 0')
+            exports['oxmysql']:execute('UPDATE player_vehicles SET state = 1 WHERE state = 0', {}, function(res)
+                print(('^2[ss-garage]^7 %s vehicles have been moved to garage'):format(res.affectedRows))
+            end)
         end
     end)
 
@@ -55,30 +57,30 @@ if Config.Framework == 'qb' then
             table.insert(params, garage)
         end
 
-        local result = exports['oxmysql']:fetchSync(query, params)
+        exports['oxmysql']:execute(query, params, function(result)
+            for _, vehicleData in ipairs(result) do
+                local label = QBCore.Shared.Vehicles[vehicleData.vehicle] and QBCore.Shared.Vehicles[vehicleData.vehicle].name or vehicleData.vehicle
+                table.insert(vehicles, {
+                    plate = vehicleData.plate,
+                    label = label,
+                    state = vehicleData.state,
+                    isImpounded = vehicleData.state == 2,
+                    impoundPrice = vehicleData.impound_price or Config.Impound.DefaultImpoundPrice,
+                    garage = vehicleData.garage,
+                    vehicle = vehicleData.vehicle,
+                    fuel = vehicleData.fuel or 100,
+                    engine = vehicleData.engine or 1000,
+                    body = vehicleData.body or 100,
+                })
+            end
 
-        for _, vehicleData in pairs(result) do
-            local label = QBCore.Shared.Vehicles[vehicleData.vehicle] and QBCore.Shared.Vehicles[vehicleData.vehicle].name or vehicleData.vehicle
-            table.insert(vehicles, {
-                plate = vehicleData.plate,
-                label = label,
-                state = vehicleData.state,
-                isImpounded = vehicleData.state == 2,
-                impoundPrice = vehicleData.impound_price or Config.Impound.DefaultImpoundPrice,
-                garage = vehicleData.garage,
-                vehicle = vehicleData.vehicle,
-                fuel = vehicleData.fuel or 100,
-                engine = vehicleData.engine or 1000,
-                body = vehicleData.body or 100,
-            })
-        end
-
-        local filteredVehicles = filterVehiclesByCategory(vehicles, category)
-        cb(filteredVehicles)
+            local filteredVehicles = filterVehiclesByCategory(vehicles, category)
+            cb(filteredVehicles)
+        end)
     end)
 
     QBCore.Functions.CreateCallback('qb-garages:server:getHouseGarage', function(_, cb, house)
-        local houseInfo = MySQL.single.await('SELECT * FROM houselocations WHERE name = ?', { house })
+        local houseInfo = exports['oxmysql']:fetchSync('SELECT * FROM houselocations WHERE name = ?', { house })
         cb(houseInfo)
     end)
 
@@ -215,22 +217,31 @@ if Config.Framework == 'qb' then
 
     QBCore.Functions.CreateCallback('ss-garage:qb-parkVehicle', function(source, cb, plate, vehProps, garage, fuel, engine, body)
         local Player = QBCore.Functions.GetPlayer(source)
-
-        local isOwner = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?', { Player.PlayerData.citizenid, plate })
-
-        if not isOwner[1] then 
-            return cb(false)
-        end
     
-        for key, value in pairs(vehProps) do
-            if type(value) == "boolean" then
-                vehProps[key] = value and 1 or 0
+        exports['oxmysql']:fetch('SELECT citizenid FROM player_vehicles WHERE plate = ?', {plate}, function(result)
+            if result[1] then
+                local isOwner = result[1].citizenid
+                if isOwner == Player.PlayerData.citizenid then
+                    for key, value in pairs(vehProps) do
+                        if type(value) == "boolean" then
+                            vehProps[key] = value and 1 or 0
+                        end
+                    end
+    
+                    exports['oxmysql']:execute('UPDATE player_vehicles SET state = ?, garage = ?, mods = ?, fuel = ?, body = ?, engine = ? WHERE plate = ?', {1, garage, json.encode(vehProps), fuel, body, engine, plate})
+    
+                    OutsideVehicles[plate] = nil
+                    cb(true)
+                else
+                    print('not the owner')
+                    print(isOwner, Player.PlayerData.citizenid)
+                    cb(false)
+                end
+            else
+                print('Plate not found:', plate)
+                cb(false)
             end
-        end
-    
-        exports['oxmysql']:execute('UPDATE player_vehicles SET state = 1, garage = ?, mods = ?, fuel = ?, body = ?, engine = ? WHERE citizenid = ? AND plate = ?', { garage, json.encode(vehProps), fuel, body, engine, Player.PlayerData.citizenid, plate })
-        OutsideVehicles[plate] = nil
-        cb(true)
+        end)
     end)
 
     RegisterNetEvent('qb-garages:server:syncGarage', function(updatedGarages)
