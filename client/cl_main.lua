@@ -142,14 +142,19 @@ end)
 
 function GetFreeSpot()
     local location = nil
-    for i = 1, #Config.Garages[CurrentGarage].spawns, 1 do
-        local isOccupied = IsPositionOccupied( Config.Garages[CurrentGarage].spawns.x, Config.Garages[CurrentGarage].spawns.y, Config.Garages[CurrentGarage].spawns.z, 3.0, false, true, false, false, false, 0, false )
+    for k,v in pairs(Config.Garages[CurrentGarage].spawns) do
+        local chosenSpawnPoint = Config.Garages[CurrentGarage].spawns[k]
+        local isOccupied = IsPositionOccupied( chosenSpawnPoint.x, chosenSpawnPoint.y, chosenSpawnPoint.z, 5.0, false, true, false, false, false, 0, false )
         if not isOccupied then
-            location = i
+            location = chosenSpawnPoint
             break
         end
     end
-    return Config.Garages[CurrentGarage].spawns[location]
+    if not location then
+        print('No spawn points available')
+        return
+    end
+    return location
 end
 
 function doCarDamage(currentVehicle, stats, props)
@@ -157,6 +162,9 @@ function doCarDamage(currentVehicle, stats, props)
     local body = stats.body + 0.0
     SetVehicleEngineHealth(currentVehicle, engine)
     SetVehicleBodyHealth(currentVehicle, body)
+
+    if Config.Framework == 'esx' then local props = json.decode(props) end
+
     if props.doorStatus then
         for k, v in pairs(props.doorStatus) do
             if v then SetVehicleDoorBroken(currentVehicle, tonumber(k), true) end
@@ -169,7 +177,9 @@ function doCarDamage(currentVehicle, stats, props)
     end
     if props.windowStatus then
         for k, v in pairs(props.windowStatus) do
-            if not v then SmashVehicleWindow(currentVehicle, tonumber(k)) end
+            if not v then
+                SmashVehicleWindow(currentVehicle, tonumber(k)) 
+            end
         end
     end
 end
