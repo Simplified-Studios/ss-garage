@@ -247,4 +247,8 @@ if Config.Framework == 'qb' then
     RegisterNetEvent('qb-garages:server:syncGarage', function(updatedGarages)
         Config.Garages = updatedGarages
     end)
+
+    exports('GetGarages', function()
+        return Config.Garages
+    end)
 end
