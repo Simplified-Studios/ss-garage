@@ -51,7 +51,7 @@ if Config.Framework == 'qb' then
         local params = { Player.PlayerData.citizenid }
 
         if _type == 'depot' then
-            query = query .. ' AND state = 2 AND depotprice > 0'
+            query = query .. ' AND state = 2'
         elseif Config.RealisticGarage then
             query = query .. ' AND garage = ? AND state = 1'
             table.insert(params, garage)
