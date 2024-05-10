@@ -244,6 +244,59 @@ if Config.Framework == 'qb' then
         end)
     end)
 
+    QBCore.Functions.CreateCallback('qb-garages:server:GetPlayerVehicles', function(source, cb)
+    local Player = QBCore.Functions.GetPlayer(source)
+    local Vehicles = {}
+
+    MySQL.rawExecute('SELECT * FROM player_vehicles WHERE citizenid = ?', { Player.PlayerData.citizenid }, function(result)
+        if result[1] then
+            for _, v in pairs(result) do
+                local VehicleData = QBCore.Shared.Vehicles[v.vehicle]
+
+                local VehicleGarage = "Error"
+                if v.garage ~= nil then
+                    if Config.Garages[v.garage] ~= nil then
+                        VehicleGarage = Config.Garages[v.garage].label
+                    else
+                        VehicleGarage = "House Garage"
+                    end
+                end
+
+                local stateTranslation
+                if v.state == 0 then
+                    stateTranslation = "Out"
+                elseif v.state == 1 then
+                    stateTranslation = "Parked"
+                elseif v.state == 2 then
+                    stateTranslation = "Impound"
+                end
+
+                local fullname
+                if VehicleData and VehicleData['brand'] then
+                    fullname = VehicleData['brand'] .. ' ' .. VehicleData['name']
+                else
+                    fullname = VehicleData and VehicleData['name'] or 'Unknown Vehicle'
+                end
+
+                Vehicles[#Vehicles + 1] = {
+                    fullname = fullname,
+                    brand = VehicleData and VehicleData['brand'] or '',
+                    model = VehicleData and VehicleData['name'] or '',
+                    plate = v.plate,
+                    garage = VehicleGarage,
+                    state = stateTranslation,
+                    fuel = v.fuel,
+                    engine = v.engine,
+                    body = v.body
+                }
+            end
+            cb(Vehicles)
+        else
+            cb(nil)
+        end
+    end)
+end)
+
     RegisterNetEvent('qb-garages:server:syncGarage', function(updatedGarages)
         Config.Garages = updatedGarages
     end)
