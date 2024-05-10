@@ -44,6 +44,10 @@ if Config.Framework == 'esx' then
             return xPlayer.showNotification(Locales[Config.Language]['vehout'])
         end
 
+        if isOwned[1] and isOwned[1].vehicle then
+            isOwned[1].vehicle = json.decode(isOwned[1].vehicle)
+        end
+
         if isOwned[1] then
             ESX.OneSync.SpawnVehicle(vehicle, vector3(coords.x, coords.y, coords.z), coords.w, isOwned[1].vehicle, function(netid)
                 local vehicle = NetworkGetEntityFromNetworkId(netid)
