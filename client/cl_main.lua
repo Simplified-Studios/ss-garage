@@ -150,10 +150,7 @@ function GetFreeSpot()
             break
         end
     end
-    if not location then
-        print('No spawn points available')
-        return
-    end
+    
     return location
 end
 

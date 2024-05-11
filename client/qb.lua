@@ -3,6 +3,9 @@ if Config.Framework == 'qb' then
 
     RegisterNetEvent('ss-garage:client:SpawnVehicle', function(data)
         local coords = GetFreeSpot()
+
+        if coords == nil then return QBCore.Functions.Notify(Locales[Config.Language]["noparkingspace"], 'error') end
+
         QBCore.Functions.TriggerCallback('ss-garage:qb-spawnVehicle', function(netId, properties, plate)
             while not NetworkDoesNetworkIdExist(netId) do Wait(10) end
             local veh = NetworkGetEntityFromNetworkId(netId)

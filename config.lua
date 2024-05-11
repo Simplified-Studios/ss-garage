@@ -477,7 +477,7 @@ Config.Garages = {
             vector4(2324.57, 3117.79, 48.21, 4.05)
         },
         type = "depot",
-        category = 'rig',
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["depot"],
     },
@@ -487,8 +487,8 @@ Config.Garages = {
         spawns = {
             vector4(167.0, -3203.89, 5.94, 271.27)
         },
-        type = "rig",
-        category = 'rig',
+        type = "car",
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["garage"],
     },
@@ -498,8 +498,8 @@ Config.Garages = {
         spawns = {
             vector4(127.69, 6605.84, 31.93, 223.67)
         },
-        type = "rig",
-        category = 'rig',
+        type = "car",
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["garage"],
     },
@@ -509,8 +509,8 @@ Config.Garages = {
         spawns = {
             vector4(-2521.61, 2326.45, 33.13, 88.7)
         },
-        type = "rig",
-        category = 'rig',
+        type = "car",
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["garage"],
     },
@@ -520,8 +520,8 @@ Config.Garages = {
         spawns = {
             vector4(2561.67, 476.68, 108.49, 177.86)
         },
-        type = "rig",
-        category = 'rig',
+        type = "car",
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["garage"],
     },
@@ -531,8 +531,8 @@ Config.Garages = {
         spawns = {
             vector4(-39.39, -2527.81, 6.08, 326.18)
         },
-        type = "rig",
-        category = 'rig',
+        type = "car",
+        category = 'car',
         canTransfer = false,
         blip = Config.Blips["garage"],
     }

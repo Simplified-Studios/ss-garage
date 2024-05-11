@@ -3,6 +3,9 @@ if Config.Framework == 'esx' then
 
     RegisterNetEvent('ss-garage:client:SpawnVehicle', function(data)
         local coords = GetFreeSpot()
+
+        if coords == nil then return ESX.ShowNotification(Locales[Config.Language]['noparkingspace']) end
+
         ESX.TriggerServerCallback('ss-garage:esx-spawnVehicle', function(netid, properties, plate)
             if netid then
                 local veh = NetToVeh(netid)

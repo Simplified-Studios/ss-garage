@@ -16,6 +16,7 @@ Locales["en"] = {
     ["impoundpaid"] = "Vehicle impound paid successfully",
     ["notaccess"] = "You do not have access to this garage",
     ["novehicles"] = "You do not have any vehicles in this garage",
+    ["noparkingspace"] = "No spawn points available",
     ["UI"] = {
         ["viewinggarage"] = "Viewing Garage",
         ["locatedin"] = "Currently viewing garage located in",
