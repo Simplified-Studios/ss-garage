@@ -188,12 +188,12 @@ if Config.Framework == 'qb' then
         local canTransfer = true
     
         if price > 0 then
-            if player.PlayerData.money.bank < price then
+            if target.PlayerData.money.bank < price then
                 canTransfer = false
-                TriggerClientEvent('QBCore:Notify', player.PlayerData.source, Locales[Config.Language]["unotenough"], 'error')
+                TriggerClientEvent('QBCore:Notify', target.PlayerData.source, Locales[Config.Language]["unotenough"], 'error')
             else
-                player.Functions.RemoveMoney('bank', price)
-                target.Functions.AddMoney('bank', price)
+                target.Functions.RemoveMoney('bank', price)
+                player.Functions.AddMoney('bank', price)
             end
         end
     
