@@ -60,12 +60,19 @@ if Config.Framework == 'qb' then
         exports['oxmysql']:execute(query, params, function(result)
             for _, vehicleData in ipairs(result) do
                 local label = QBCore.Shared.Vehicles[vehicleData.vehicle] and QBCore.Shared.Vehicles[vehicleData.vehicle].name or vehicleData.vehicle
+
+                local price = Config.Impound.DefaultImpoundPrice
+
+                if tonumber(vehicleData.depotprice) > 0 then
+                    price = tonumber(vehicleData.depotprice)
+                end
+
                 table.insert(vehicles, {
                     plate = vehicleData.plate,
                     label = label,
                     state = vehicleData.state,
                     isImpounded = vehicleData.state == 2,
-                    impoundPrice = vehicleData.impound_price or Config.Impound.DefaultImpoundPrice,
+                    impoundPrice = price,
                     garage = vehicleData.garage,
                     vehicle = vehicleData.vehicle,
                     fuel = vehicleData.fuel or 100,
@@ -86,8 +93,7 @@ if Config.Framework == 'qb' then
 
     QBCore.Functions.CreateCallback('ss-garage:qb-spawnVehicle', function(source, cb, plate, vehicle, coords)
         local Player = QBCore.Functions.GetPlayer(source)
-        local res = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND vehicle = ? AND state = ?', { Player.PlayerData.citizenid, plate, vehicle, 1 })
-
+        local res = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, plate, vehicle })
         if res[1] then
             local veh = CreateVehicleServerSetter(GetHashKey(vehicle), 'automobile', coords.x, coords.y, coords.z, coords.w)
             local netId = NetworkGetNetworkIdFromEntity(veh)
@@ -113,11 +119,15 @@ if Config.Framework == 'qb' then
         local res = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.vehicle })
 
         if res then
-            local depotprice = tonumber(res[1].depotprice)
+            local depotprice = Config.Impound.DefaultImpoundPrice
+
+            if tonumber(res[1].depotprice) > 0 then
+                depotprice = tonumber(res[1].depotprice)
+            end
 
             if Player.PlayerData.money.bank >= depotprice then
                 Player.Functions.RemoveMoney('bank', depotprice)
-                exports['oxmysql']:execute('UPDATE player_vehicles SET state = 0, depotprice = NULL WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.vehicle })
+                exports['oxmysql']:execute('UPDATE player_vehicles SET state = 0, depotprice = 0 WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.vehicle })
                 TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Locales[Config.Language]["impoundpaid"], 'success')
                 cb(true)
             else

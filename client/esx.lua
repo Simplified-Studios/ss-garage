@@ -47,6 +47,7 @@ if Config.Framework == 'esx' then
                 for _,vehicleData in pairs(vehicles) do
                     local data = json.decode(vehicleData.vehicle)
                     local modelName = GetDisplayNameFromVehicleModel(data.model) or data.model
+
                     table.insert(sortedVehicles, {
                         plate = vehicleData.plate,
                         label = GetLabelText(modelName),
