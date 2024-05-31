@@ -81,8 +81,12 @@ if Config.Framework == 'qb' then
                 })
             end
 
-            local filteredVehicles = filterVehiclesByCategory(vehicles, category)
-            cb(filteredVehicles)
+            if Config.CustomCategorys == false then
+                local filteredVehicles = filterVehiclesByCategory(vehicles, category)
+                cb(filteredVehicles)
+            else 
+                cb(vehicles)
+            end
         end)
     end)
 

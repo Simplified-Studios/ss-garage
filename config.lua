@@ -4,6 +4,7 @@ Config = {
     Framework = 'qb', -- Which framework should the garage use? (qb, esx)
     WarpIntoVehicle = true, -- Should the player be teleported into the vehicle?
     RealisticGarage = true,
+    CustomCategorys = false,
     
     QBCore = {
         FuelResource = 'LegacyFuel',
