@@ -5,6 +5,7 @@ Config = {
     WarpIntoVehicle = true, -- Should the player be teleported into the vehicle?
     RealisticGarage = true,
     CustomCategorys = false,
+    TextUI = 'standard', -- Option for text UI: 'standard' or 'qb-drawtextui'
     
     QBCore = {
         FuelResource = 'LegacyFuel',

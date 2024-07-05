@@ -88,10 +88,18 @@ function CreateZone(index, garage)
                 text = Locales[Config.Language]["opengarage"]
             end
             if text then
-                SendNUIMessage({ action = 'helptext', show = true, text = text })
+                if Config.TextUI == "standard" then
+                    SendNUIMessage({ action = 'helptext', show = true, text = text })
+                elseif Config.TextUI == "qb-drawtextui" then
+                    exports['qb-core']:DrawText(text, 'left')
+                end
             end            
         else
-            SendNUIMessage({ action = 'helptext', show = false })
+            if Config.TextUI == "standard" then
+                SendNUIMessage({ action = 'helptext', show = false })
+            elseif Config.TextUI == "qb-drawtextui" then
+                exports['qb-core']:HideText()
+            end
             CurrentGarage = nil
             listenForKey = false
         end
