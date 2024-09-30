@@ -14,6 +14,7 @@ Locales["en"] = {
     ["vnotfound"] = "Vehicle not found",
     ["vparked"] = "You have parked your vehicle",
     ["impoundpaid"] = "Vehicle impound paid successfully",
+    ["repairsuccess"] = "Vehicle was successfully repaired!",
     ["notaccess"] = "You do not have access to this garage",
     ["novehicles"] = "You do not have any vehicles in this garage",
     ["noparkingspace"] = "No spawn points available",

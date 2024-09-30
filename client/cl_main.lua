@@ -29,6 +29,12 @@ RegisterNuiCallback('payForImpound', function(data, cb)
     cb('ok')
 end)
 
+RegisterNuiCallback('repairVehicle', function(data, cb)
+    SetNuiFocus(false, false)
+    TriggerEvent('ss-garage:client:RepairVehicle', data)
+    cb('ok')
+end)
+
 function CreateZone(index, garage)
     local zone = CircleZone:Create(garage.coords, 10.0, {
         name = index,

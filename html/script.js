@@ -54,6 +54,12 @@ new Vue({
                 vehicle: vehicle
             }));
         },
+        repairVehicle(vehicle) {
+            this.garageVisible = false;
+            $.post('https://orp_garages/repairVehicle', JSON.stringify({
+                vehicle: vehicle
+            }));
+        },
         swapGarage(vehicle) {
             this.currentVehicle = vehicle;
             this.garageVisible = false;

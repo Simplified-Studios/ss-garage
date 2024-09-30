@@ -1,7 +1,7 @@
 if Config.Framework == 'qb' then
     QBCore = exports['qb-core']:GetCoreObject()
 
-    RegisterNetEvent('ss-garage:client:SpawnVehicle', function(data)
+    RegisterNetEvent('ss-garage:client:SpawnVehicle', function(data, newRepair)
         local coords = GetFreeSpot()
 
         if coords == nil then return QBCore.Functions.Notify(Locales[Config.Language]["noparkingspace"], 'error') end
@@ -10,6 +10,12 @@ if Config.Framework == 'qb' then
             while not NetworkDoesNetworkIdExist(netId) do Wait(10) end
             local veh = NetworkGetEntityFromNetworkId(netId)
             local stats = { engine = data.engine, body = data.body, fuel = data.fuel }
+
+			if newRepair then
+				stats.engine = 1000
+				stats.body = 1000
+			end
+
             SetVehicleProperties(veh, properties)
             doCarDamage(veh, stats, properties)
 
@@ -27,6 +33,14 @@ if Config.Framework == 'qb' then
         QBCore.Functions.TriggerCallback('ss-garage:qb-payForImpound', function(success)
             if success then
                 TriggerEvent('ss-garage:client:SpawnVehicle', data.vehicle)
+            end
+        end, data)
+    end)
+
+    RegisterNetEvent('ss-garage:client:RepairVehicle', function(data)
+        QBCore.Functions.TriggerCallback('ss-garage:qb-repairVehicle', function(success)
+            if success then
+                TriggerEvent('ss-garage:client:SpawnVehicle', data.vehicle, true)
             end
         end, data)
     end)

@@ -1,4 +1,5 @@
 OutsideVehicles = {}
+RegisteredVehicles = {}
 
 local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
 

@@ -42,6 +42,7 @@
                                             <br>
                                             <a v-if="vehicle.state === 0" class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Out</a>
                                             <a v-if="vehicle.state === 1" class="rounded-md bg-slate-600 text-xs font-medium tracking-wide px-[5px] py-[2px] text-white">{{ currentGarage.label }}</a>
+                                            <a v-if="vehicle.body === 0" class="rounded-md bg-slate-600 text-xs font-medium tracking-wide px-[5px] py-[2px] text-white">Destroyed</a>
                                             <br v-if="vehicle.state === 2">
                                             <a v-if="vehicle.state === 2" class="ml-2 rounded-md bg-rose-400 text-xs font-medium tracking-wide px-[5px] py-[2px] text-stone-800">Impounded</a>
                                             <p class="mt-5 text-[15px] font-bold"> {{ locales.vehstatus }} </p>

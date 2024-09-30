@@ -15,6 +15,52 @@ if Config.Framework == 'qb' then
         end
     end)
 
+    AddEventHandler('playerDropped', function()
+		local src = source
+		
+		for plate, sourceId in pairs(RegisteredVehicles) do
+			if sourceId == src then
+				
+				local vehicleData = OutsideVehicles[plate]
+				if vehicleData then
+					local veh = vehicleData.entity
+					if DoesEntityExist(veh) then
+						DeleteEntity(veh)
+
+						if Debug then print(('^1[debug]^7 %s vehicle has been removed from the world'):format(plate)) end
+					else
+						exports['oxmysql']:execute('UPDATE player_vehicles SET engine = 0, body = 0 WHERE plate = ?', { plate })
+
+						if Debug then print(('^1[debug]^7 %s vehicle was not valid in the world'):format(plate)) end
+						if Debug then print(('^1[debug]^7 %s, set engine and body health to 0, need to insurance claim!'):format(plate)) end
+					end
+				end
+
+			end
+		end
+
+	end)
+
+	AddEventHandler('explosionEvent', function(sender, ev)
+		
+		if ev.f210 ~= 0 then
+
+			if Debug then print(('^1[debug]^7 vehicle entity %s exploded, checking validity'):format(ev.f210)) end
+
+			for plate, vehicleData in pairs(OutsideVehicles) do
+				if vehicleData.netID == ev.f210 then
+
+					exports['oxmysql']:execute('UPDATE player_vehicles SET engine = 0, body = 0, state = 1 WHERE plate = ?', { plate })
+
+					if Debug then print(('^1[debug]^7 vehicle %s exploded, setting engine and body health'):format(plate)) end
+
+				end
+			end
+
+		end
+
+	end)
+
     local function arrayToSet(array)
         local set = {}
         for _, item in ipairs(array) do
@@ -73,6 +119,7 @@ if Config.Framework == 'qb' then
                     state = vehicleData.state,
                     isImpounded = vehicleData.state == 2,
                     impoundPrice = price,
+                    repairPrice = Config.Repair.DefaultRepairPrice,
                     garage = vehicleData.garage,
                     vehicle = vehicleData.vehicle,
                     fuel = vehicleData.fuel or 100,
@@ -113,6 +160,7 @@ if Config.Framework == 'qb' then
                 return TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Locales[Config.Language]["vehout"], 'error')
             end
             
+            RegisteredVehicles[plate] = source
             OutsideVehicles[plate] = { netID = netId, entity = veh }
             cb(netId, vehProps, plate)
         end
@@ -144,6 +192,33 @@ if Config.Framework == 'qb' then
         end
     end)
 
+    QBCore.Functions.CreateCallback('ss-garage:qb-repairVehicle', function(source, cb, data)
+        local Player = QBCore.Functions.GetPlayer(source)
+        local res = exports['oxmysql']:fetchSync('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.vehicle })
+
+        if res then
+            local depotprice = Config.Repair.DefaultRepairPrice
+
+            if tonumber(res[1].depotprice) > 0 then
+                depotprice = tonumber(res[1].depotprice)
+            end
+
+            if Player.PlayerData.money.bank >= depotprice then
+                Player.Functions.RemoveMoney('bank', depotprice)
+                exports['oxmysql']:execute('UPDATE player_vehicles SET state = 0, body = 1000, engine = 1000 WHERE citizenid = ? AND plate = ? AND vehicle = ?', { Player.PlayerData.citizenid, data.vehicle.plate, data.vehicle.vehicle })
+                TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Locales[Config.Language]["repairsuccess"], 'success')
+                cb(true)
+            else
+                TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Locales[Config.Language]["unotenough"], 'error')
+                cb(false)
+            end
+        else
+            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Locales[Config.Language]["vehout"], 'error')
+            cb(false)
+        end
+    end)
+
+
     RegisterNetEvent('ss-garage:server:SwapGarage', function(data)
         local Player = QBCore.Functions.GetPlayer(source)
 
@@ -174,6 +249,14 @@ if Config.Framework == 'qb' then
             exports['oxmysql']:execute('UPDATE player_vehicles SET garage = ? WHERE citizenid = ? AND vehicle = ? AND plate = ?', { data.garage, Player.PlayerData.citizenid, data.vehicle.vehicle, data.vehicle.plate })
             TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Vehicle swapped successfully', 'success')
         end
+    end)
+
+    RegisterNetEvent('ss-garage:server:registerVehicleSpawn', function(networkedId)
+        local Player = QBCore.Functions.GetPlayer(source)
+		local Entity = NetworkGetEntityFromNetworkId(networkedId)
+
+		RegisteredVehicles[plate] = source
+		OutsideVehicles[plate] = { netID = networkedId, entity = Entity }
     end)
 
     RegisterNetEvent('ss-garage:server:TransferVehicle', function(data)
